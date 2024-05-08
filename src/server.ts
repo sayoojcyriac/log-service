@@ -31,6 +31,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   next(err); // If it's not a JSON parse error, pass it to the default error handler
 });
 
+// Health check endpoint
+app.get("/health", (req: Request, res: Response) => {
+  res.status(200).send("OK");
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
