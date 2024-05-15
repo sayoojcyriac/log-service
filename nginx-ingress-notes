@@ -1,0 +1,49 @@
+Step 1: Generate a Self-Signed Certificate
+==========================================
+
+openssl genrsa -out tls.key 2048
+openssl req -new -key tls.key -out tls.csr -subj "/CN=54.157.9.125.nip.io"
+cat > openssl.cnf <<EOF
+[ req ]
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+x509_extensions    = v3_ca
+
+[ req_distinguished_name ]
+countryName                 = Country Name (2 letter code)
+countryName_default         = US
+stateOrProvinceName         = State or Province Name (full name)
+stateOrProvinceName_default = New York
+localityName                = Locality Name (eg, city)
+localityName_default        = New York
+organizationName            = Organization Name (eg, company)
+organizationName_default    = My Company
+commonName                  = Common Name (e.g. server FQDN or YOUR name)
+commonName_default          = 54.157.9.125.nip.io
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ v3_ca ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = 54.157.9.125.nip.io
+EOF
+
+openssl x509 -req -in tls.csr -signkey tls.key -out tls.crt -days 365 -extensions req_ext -extfile openssl.cnf
+
+
+Step 2: Create a Kubernetes Secret for the TLS Certificate
+==========================================================
+kubectl create secret tls default-ssl-cert --cert=tls.crt --key=tls.key -n ingress-nginx
+
+Step 3: Configure the NGINX Ingress Controller to Use the Default Certificate
+=============================================================================
+kubectl edit deployment nginx-ingress-controller -n ingress-nginx
+
+Step 4: Verify HTTPS Access
+https://54.157.9.125.nip.io
+ *** Ensure the self-signed cert is trusted by the browser.
+====================================================================================================================

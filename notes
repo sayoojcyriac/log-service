@@ -7,3 +7,4 @@ Install nginx ingress:
 - helm install ingress-nginx ingress-nginx/ingress-nginx
 
 curl -X POST http://127.0.0.1/api/v1/logs -H "Content-Type: application/json" -d '{"message": "This is a test test log"}'
+==========================================================================================================================
